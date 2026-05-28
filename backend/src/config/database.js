@@ -1,4 +1,7 @@
 const { createClient } = require('@supabase/supabase-js');
+if (typeof global.WebSocket === 'undefined') {
+  global.WebSocket = require('ws');
+}
 require('dotenv').config();
 
 const supabaseUrl = process.env.SUPABASE_URL || 'https://placeholder.supabase.co';
