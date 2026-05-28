@@ -10,8 +10,8 @@ echo "🚀 Starting Alice deployment sequence..."
 git pull origin main
 
 # 2. Re-compile containers in detached mode
-docker-compose down
-docker-compose up --build -d
+docker compose down
+docker compose up --build -d
 
 # 3. Clean untagged images to preserve memory
 docker image prune -f
