@@ -1,0 +1,12 @@
+{
+  "watch": ["src"],
+  "ext": "js,json",
+  "ignore": [
+    "node_modules",
+    "whatsapp_auth_info",
+    "session-*",
+    "logs",
+    "temp",
+    "C:\\Users\\Support\\.gemini\\antigravity-ide\\brain\\*"
+  ]
+}
