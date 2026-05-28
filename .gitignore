@@ -29,3 +29,6 @@ out/
 backups/
 logs/
 *.log
+
+# WhatsApp session auth keys (never commit these)
+backend/whatsapp_auth_info/
