@@ -17,7 +17,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.alice-api.rule=Host(`aliceinteligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api.rule=(Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`)) && PathPrefix(`/api`)"
       - "traefik.http.routers.alice-api.entrypoints=websecure"
       - "traefik.http.routers.alice-api.tls.certresolver=letsencrypt"
       - "traefik.http.services.alice-api.loadbalancer.server.port=3000"
@@ -33,7 +33,7 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.alice-frontend.rule=Host(`aliceinteligence.com`)"
+      - "traefik.http.routers.alice-frontend.rule=Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`)"
       - "traefik.http.routers.alice-frontend.entrypoints=websecure"
       - "traefik.http.routers.alice-frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.alice-frontend.loadbalancer.server.port=80"
