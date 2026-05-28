@@ -28,6 +28,7 @@ const whatsappRoutes = require('./api/routes/whatsapp');
 const integrationRoutes = require('./api/routes/integrations');
 
 const app = express();
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 3000;
 
 // Security and Logging Middlewares
