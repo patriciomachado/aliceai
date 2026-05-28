@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../services/api';
 import { useApp } from '../context/AppContext';
@@ -31,6 +31,18 @@ const Inbox = () => {
   const [editForm, setEditForm] = useState({ name: '', phone: '', whatsapp: '', tags: '' });
   const [simulationModalOpen, setSimulationModalOpen] = useState(false);
   const [simulatedQuestion, setSimulatedQuestion] = useState('');
+
+  const messagesContainerRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, activeConvId]);
 
   // 1. Fetch conversations
   const { data: conversations = [], isLoading: convsLoading } = useQuery({
@@ -408,7 +420,10 @@ const Inbox = () => {
             </div>
 
             {/* Historic conversation list */}
-            <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+            <div 
+              ref={messagesContainerRef}
+              className="flex-1 overflow-y-auto p-4 flex flex-col gap-4"
+            >
               {msgsLoading ? (
                 <div className="text-center text-xs text-muted-foreground">Carregando logs...</div>
               ) : messages.map((msg, idx) => {
