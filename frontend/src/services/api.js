@@ -1,8 +1,22 @@
 import axios from 'axios';
 
-// Instantiate API connection
+const getBaseURL = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== 'undefined') {
+    const { hostname } = window.location;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3000/api';
+    }
+    // Production VPS environment where Traefik routes /api to the backend
+    return '/api';
+  }
+  return 'http://localhost:3000/api';
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+  baseURL: getBaseURL(),
   timeout: 30000, // 30 seconds — needed for AI processing + DB queries
   headers: {
     'Content-Type': 'application/json'
