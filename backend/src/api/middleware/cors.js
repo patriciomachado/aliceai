@@ -5,7 +5,16 @@ const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3001',
   'http://localhost:3000',
   'https://app.alice.ai',
-  'https://alice.ai'
+  'https://alice.ai',
+  // Production Domains (Supporting both spelling variations)
+  'http://aliceintelligence.com',
+  'https://aliceintelligence.com',
+  'http://www.aliceintelligence.com',
+  'https://www.aliceintelligence.com',
+  'http://aliceinteligence.com',
+  'https://aliceinteligence.com',
+  'http://www.aliceinteligence.com',
+  'https://www.aliceinteligence.com'
 ];
 
 const corsOptions = {
