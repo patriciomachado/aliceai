@@ -16,7 +16,8 @@ import {
   Edit,
   Trash2,
   CheckCircle,
-  X
+  X,
+  Info
 } from 'lucide-react';
 
 const Inbox = () => {
@@ -315,7 +316,7 @@ const Inbox = () => {
                       </span>
                     ) : (activeConv?.customers?.metadata?.ai_paused_until && new Date(activeConv.customers.metadata.ai_paused_until) > new Date()) ? (
                       <span className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 rounded-full px-2 py-0.5 font-bold uppercase flex items-center gap-1 animate-pulse">
-                        ⏳ IA Pausada até {new Date(activeConv.customers.metadata.ai_paused_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        ⏳ IA Pausada até {new Date(activeConv?.customers?.metadata?.ai_paused_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     ) : null}
                   </div>
@@ -447,7 +448,7 @@ const Inbox = () => {
             ) : (activeConv?.customers?.metadata?.ai_paused_until && new Date(activeConv.customers.metadata.ai_paused_until) > new Date()) ? (
               <div className="mx-4 mt-2 px-3 py-2 bg-amber-500/5 border border-amber-500/15 rounded-xl flex items-center gap-2 text-xs text-amber-600 dark:text-amber-400 animate-fade-in shrink-0">
                 <Info className="w-4 h-4 shrink-0" />
-                <span>O agente de IA está <strong>pausado</strong> até <strong>{new Date(activeConv.customers.metadata.ai_paused_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong> devido a uma resposta humana (takeover).</span>
+                <span>O agente de IA está <strong>pausado</strong> até <strong>{new Date(activeConv?.customers?.metadata?.ai_paused_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong> devido a uma resposta humana (takeover).</span>
               </div>
             ) : null}
 
