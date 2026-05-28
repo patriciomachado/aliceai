@@ -120,7 +120,7 @@ const nexusService = {
             sku
           } = item;
 
-          if (!name || !price) {
+          if (!name || price === undefined || price === null || isNaN(price)) {
             results.failed++;
             continue;
           }
