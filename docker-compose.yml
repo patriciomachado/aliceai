@@ -11,9 +11,16 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - REDIS_URL=redis://redis:6379
+    env_file: ./backend/.env
     depends_on:
       - redis
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alice-api.rule=Host(`aliceinteligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api.entrypoints=websecure"
+      - "traefik.http.routers.alice-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.alice-api.loadbalancer.server.port=3000"
 
   frontend:
     build:
@@ -24,6 +31,12 @@ services:
     depends_on:
       - backend
     restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alice-frontend.rule=Host(`aliceinteligence.com`)"
+      - "traefik.http.routers.alice-frontend.entrypoints=websecure"
+      - "traefik.http.routers.alice-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.alice-frontend.loadbalancer.server.port=80"
 
   redis:
     image: redis:7-alpine
@@ -31,18 +44,6 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    restart: always
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - backend
-      - frontend
     restart: always
 
 volumes:
