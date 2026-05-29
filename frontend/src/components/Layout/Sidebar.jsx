@@ -58,7 +58,7 @@ const Sidebar = () => {
       <div className="flex flex-col gap-8">
         {/* Brand/Workspace Logo Panel */}
         <div className="flex items-center gap-3 px-2 py-1">
-          <img src="/logoalice.png" alt="Alice Logo" className="w-9 h-9 rounded-xl object-cover shadow-glowing" />
+          <img src="/logoaliceclean.png" alt="Alice Logo" className="w-9 h-9 object-contain shadow-glowing" />
           <div className="flex flex-col">
             <span className="text-sm font-bold tracking-wide text-foreground">Alice</span>
             <span className="text-xs text-foreground/50">{activeWorkspace?.name || 'Carregando...'}</span>
