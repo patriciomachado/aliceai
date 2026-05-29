@@ -16,9 +16,7 @@ const Welcome = () => {
       <div className="flex-1 flex flex-col justify-between p-8 lg:p-16 z-10 border-r border-white/5">
         {/* Header Logo */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-500 via-indigo-600 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-600/30">
-            <MessageSquare className="w-5.5 h-5.5 text-white" />
-          </div>
+          <img src="/logoalice.png" alt="Alice Logo" className="w-10 h-10 rounded-2xl object-cover shadow-lg shadow-indigo-600/30" />
           <span className="text-xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70 uppercase font-outfit">Alice</span>
         </div>
 

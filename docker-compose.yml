@@ -17,15 +17,53 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      # Router HTTPS (Secure)
-      - "traefik.http.routers.alice-api.rule=(Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`) || Host(`www.aliceinteligence.com`) || Host(`www.aliceintelligence.com`)) && PathPrefix(`/api`)"
-      - "traefik.http.routers.alice-api.entrypoints=websecure"
-      - "traefik.http.routers.alice-api.tls.certresolver=letsencrypt"
+      
+      # HTTPS - aliceinteligence.com (Single L)
+      - "traefik.http.routers.alice-api-single.rule=Host(`aliceinteligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-single.entrypoints=websecure"
+      - "traefik.http.routers.alice-api-single.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alice-api-single.service=alice-api"
+
+      # HTTPS - www.aliceinteligence.com (Single L WWW)
+      - "traefik.http.routers.alice-api-single-www.rule=Host(`www.aliceinteligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-single-www.entrypoints=websecure"
+      - "traefik.http.routers.alice-api-single-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alice-api-single-www.service=alice-api"
+
+      # HTTPS - aliceintelligence.com (Double L)
+      - "traefik.http.routers.alice-api-double.rule=Host(`aliceintelligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-double.entrypoints=websecure"
+      - "traefik.http.routers.alice-api-double.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alice-api-double.service=alice-api"
+
+      # HTTPS - www.aliceintelligence.com (Double L WWW)
+      - "traefik.http.routers.alice-api-double-www.rule=Host(`www.aliceintelligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-double-www.entrypoints=websecure"
+      - "traefik.http.routers.alice-api-double-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alice-api-double-www.service=alice-api"
+
+      # Global API Service Port Definition
       - "traefik.http.services.alice-api.loadbalancer.server.port=3000"
-      # Router HTTP (Redirect to HTTPS)
-      - "traefik.http.routers.alice-api-http.rule=(Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`) || Host(`www.aliceinteligence.com`) || Host(`www.aliceintelligence.com`)) && PathPrefix(`/api`)"
-      - "traefik.http.routers.alice-api-http.entrypoints=web"
-      - "traefik.http.routers.alice-api-http.middlewares=redirect-to-https"
+
+      # HTTP Redirect to HTTPS - Single L
+      - "traefik.http.routers.alice-api-single-http.rule=Host(`aliceinteligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-single-http.entrypoints=web"
+      - "traefik.http.routers.alice-api-single-http.middlewares=redirect-to-https@docker"
+
+      # HTTP Redirect to HTTPS - Single L WWW
+      - "traefik.http.routers.alice-api-single-www-http.rule=Host(`www.aliceinteligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-single-www-http.entrypoints=web"
+      - "traefik.http.routers.alice-api-single-www-http.middlewares=redirect-to-https@docker"
+
+      # HTTP Redirect to HTTPS - Double L
+      - "traefik.http.routers.alice-api-double-http.rule=Host(`aliceintelligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-double-http.entrypoints=web"
+      - "traefik.http.routers.alice-api-double-http.middlewares=redirect-to-https@docker"
+
+      # HTTP Redirect to HTTPS - Double L WWW
+      - "traefik.http.routers.alice-api-double-www-http.rule=Host(`www.aliceintelligence.com`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-double-www-http.entrypoints=web"
+      - "traefik.http.routers.alice-api-double-www-http.middlewares=redirect-to-https@docker"
 
   frontend:
     build:
@@ -38,16 +76,55 @@ services:
     restart: always
     labels:
       - "traefik.enable=true"
-      # Router HTTPS (Secure)
-      - "traefik.http.routers.alice-frontend.rule=Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`) || Host(`www.aliceinteligence.com`) || Host(`www.aliceintelligence.com`)"
-      - "traefik.http.routers.alice-frontend.entrypoints=websecure"
-      - "traefik.http.routers.alice-frontend.tls.certresolver=letsencrypt"
+
+      # HTTPS - aliceinteligence.com (Single L)
+      - "traefik.http.routers.alice-frontend-single.rule=Host(`aliceinteligence.com`)"
+      - "traefik.http.routers.alice-frontend-single.entrypoints=websecure"
+      - "traefik.http.routers.alice-frontend-single.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alice-frontend-single.service=alice-frontend"
+
+      # HTTPS - www.aliceinteligence.com (Single L WWW)
+      - "traefik.http.routers.alice-frontend-single-www.rule=Host(`www.aliceinteligence.com`)"
+      - "traefik.http.routers.alice-frontend-single-www.entrypoints=websecure"
+      - "traefik.http.routers.alice-frontend-single-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alice-frontend-single-www.service=alice-frontend"
+
+      # HTTPS - aliceintelligence.com (Double L)
+      - "traefik.http.routers.alice-frontend-double.rule=Host(`aliceintelligence.com`)"
+      - "traefik.http.routers.alice-frontend-double.entrypoints=websecure"
+      - "traefik.http.routers.alice-frontend-double.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alice-frontend-double.service=alice-frontend"
+
+      # HTTPS - www.aliceintelligence.com (Double L WWW)
+      - "traefik.http.routers.alice-frontend-double-www.rule=Host(`www.aliceintelligence.com`)"
+      - "traefik.http.routers.alice-frontend-double-www.entrypoints=websecure"
+      - "traefik.http.routers.alice-frontend-double-www.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.alice-frontend-double-www.service=alice-frontend"
+
+      # Global Frontend Service Port Definition
       - "traefik.http.services.alice-frontend.loadbalancer.server.port=80"
-      # Router HTTP (Redirect to HTTPS)
-      - "traefik.http.routers.alice-frontend-http.rule=Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`) || Host(`www.aliceinteligence.com`) || Host(`www.aliceintelligence.com`)"
-      - "traefik.http.routers.alice-frontend-http.entrypoints=web"
-      - "traefik.http.routers.alice-frontend-http.middlewares=redirect-to-https"
-      # Definicao do Middleware de Redirecionamento
+
+      # HTTP Redirect to HTTPS - Single L
+      - "traefik.http.routers.alice-frontend-single-http.rule=Host(`aliceinteligence.com`)"
+      - "traefik.http.routers.alice-frontend-single-http.entrypoints=web"
+      - "traefik.http.routers.alice-frontend-single-http.middlewares=redirect-to-https@docker"
+
+      # HTTP Redirect to HTTPS - Single L WWW
+      - "traefik.http.routers.alice-frontend-single-www-http.rule=Host(`www.aliceinteligence.com`)"
+      - "traefik.http.routers.alice-frontend-single-www-http.entrypoints=web"
+      - "traefik.http.routers.alice-frontend-single-www-http.middlewares=redirect-to-https@docker"
+
+      # HTTP Redirect to HTTPS - Double L
+      - "traefik.http.routers.alice-frontend-double-http.rule=Host(`aliceintelligence.com`)"
+      - "traefik.http.routers.alice-frontend-double-http.entrypoints=web"
+      - "traefik.http.routers.alice-frontend-double-http.middlewares=redirect-to-https@docker"
+
+      # HTTP Redirect to HTTPS - Double L WWW
+      - "traefik.http.routers.alice-frontend-double-www-http.rule=Host(`www.aliceintelligence.com`)"
+      - "traefik.http.routers.alice-frontend-double-www-http.entrypoints=web"
+      - "traefik.http.routers.alice-frontend-double-www-http.middlewares=redirect-to-https@docker"
+
+      # Definition of Global Redirect Middleware
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
 
