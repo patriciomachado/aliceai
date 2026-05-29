@@ -247,10 +247,10 @@ const checkNexusOSInERP = async (args, workspaceId) => {
     const { customer_phone, os_number } = args;
     const nexusService = require('./nexusService');
 
-    // If an OS number was explicitly provided, search by number
+    // If an OS number was explicitly provided, search by number (with customer_phone passed as fallback context)
     if (os_number) {
-      console.log(`[AI Tool] Searching Nexus OS by number: ${os_number}`);
-      const osResult = await nexusService.getOSByNumber(os_number, workspaceId);
+      console.log(`[AI Tool] Searching Nexus OS by number: ${os_number} (Fallback Phone: ${customer_phone})`);
+      const osResult = await nexusService.getOSByNumber(os_number, workspaceId, customer_phone);
       return JSON.stringify(osResult);
     }
 

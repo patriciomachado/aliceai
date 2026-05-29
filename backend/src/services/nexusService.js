@@ -55,20 +55,49 @@ const nexusService = {
       console.log(`[Nexus Service] Fetching OS for customer ${cleanPhone} from Nexus API: ${nexusApiUrl}`);
 
       // Call the real Nexus API
-      const response = await axios.get(`${nexusApiUrl}/api/os`, {
-        params: { phone: cleanPhone },
-        headers: {
-          'Authorization': `Bearer ${nexusApiKey}`,
-          'X-Workspace-ID': workspaceId,
-          'Content-Type': 'application/json'
-        },
-        timeout: 8000
-      });
+      let response;
+      try {
+        response = await axios.get(`${nexusApiUrl}/api/os`, {
+          params: { phone: cleanPhone },
+          headers: {
+            'Authorization': `Bearer ${nexusApiKey}`,
+            'X-Workspace-ID': workspaceId,
+            'Content-Type': 'application/json'
+          },
+          timeout: 8000
+        });
+      } catch (err) {
+        console.warn(`[Nexus Service] Primary query with ${cleanPhone} failed:`, err.message);
+      }
+
+      let orders = response?.data || [];
+
+      // Brazilian phone format resiliency fallbacks (e.g. stripping 55 country code)
+      if ((!Array.isArray(orders) || orders.length === 0) && cleanPhone.startsWith('55') && cleanPhone.length >= 12) {
+        const withoutCountryCode = cleanPhone.slice(2);
+        console.log(`[Nexus Service] Primary search returned empty. Trying phone without country code 55: ${withoutCountryCode}`);
+        try {
+          const fallbackResponse = await axios.get(`${nexusApiUrl}/api/os`, {
+            params: { phone: withoutCountryCode },
+            headers: {
+              'Authorization': `Bearer ${nexusApiKey}`,
+              'X-Workspace-ID': workspaceId,
+              'Content-Type': 'application/json'
+            },
+            timeout: 8000
+          });
+          if (fallbackResponse.data && fallbackResponse.data.length > 0) {
+            orders = fallbackResponse.data;
+          }
+        } catch (fbErr) {
+          console.warn(`[Nexus Service] Fallback query with ${withoutCountryCode} failed:`, fbErr.message);
+        }
+      }
 
       return {
         success: true,
         is_mock: false,
-        orders: response.data || []
+        orders: Array.isArray(orders) ? orders : [orders]
       };
 
     } catch (err) {
@@ -77,7 +106,7 @@ const nexusService = {
         success: false,
         error: `Erro ao consultar o Nexus: ${err.message}`,
         message: 'Ocorreu uma falha de conexão com o servidor Nexus.',
-        orders: [] // Do not fabricate a fake order if the real API fails!
+        orders: []
       };
     }
   },
@@ -85,7 +114,7 @@ const nexusService = {
   /**
    * Consult a specific O.S. (Ordem de Serviço) in Nexus by its OS number/ID
    */
-  getOSByNumber: async (osNumber, workspaceId) => {
+  getOSByNumber: async (osNumber, workspaceId, customerPhone = null) => {
     try {
       // Get workspace settings to retrieve Nexus configuration
       const { data: workspace, error: wsErr } = await supabase
@@ -139,23 +168,37 @@ const nexusService = {
 
       console.log(`[Nexus Service] Fetching OS number ${cleanNumber} from Nexus API: ${nexusApiUrl}`);
 
-      // Call the real Nexus API with multiple query formats for compatibility (query, number, os_number)
-      const response = await axios.get(`${nexusApiUrl}/api/os`, {
-        params: { 
-          number: cleanNumber,
-          os_number: cleanNumber,
-          query: cleanNumber
-        },
-        headers: {
-          'Authorization': `Bearer ${nexusApiKey}`,
-          'X-Workspace-ID': workspaceId,
-          'Content-Type': 'application/json'
-        },
-        timeout: 8000
-      });
+      // Try multiple parameter variations for maximum compatibility with different ERP implementations
+      const paramsToTry = {
+        number: cleanNumber,
+        os_number: cleanNumber,
+        query: cleanNumber,
+        os: cleanNumber,
+        id: cleanNumber,
+        os_id: cleanNumber,
+        codigo: cleanNumber,
+        numero: cleanNumber,
+        search: cleanNumber
+      };
+
+      let response;
+      try {
+        response = await axios.get(`${nexusApiUrl}/api/os`, {
+          params: paramsToTry,
+          headers: {
+            'Authorization': `Bearer ${nexusApiKey}`,
+            'X-Workspace-ID': workspaceId,
+            'Content-Type': 'application/json'
+          },
+          timeout: 8000
+        });
+      } catch (err) {
+        console.warn(`[Nexus Service] OS lookup by parameters failed:`, err.message);
+      }
+
+      let orders = response?.data || [];
 
       // Also try fetching with /api/os/{number} if the list is empty just in case the API uses restful path
-      let orders = response.data || [];
       if (!Array.isArray(orders) || orders.length === 0) {
         try {
           const restResponse = await axios.get(`${nexusApiUrl}/api/os/${cleanNumber}`, {
@@ -171,6 +214,90 @@ const nexusService = {
           }
         } catch (restErr) {
           console.log(`[Nexus Service] Restful endpoint /api/os/${cleanNumber} not supported or failed:`, restErr.message);
+        }
+      }
+
+      // If still not found, try the raw integer version in case ERP stores it without leading zeros (e.g. "00022" -> "22")
+      if ((!Array.isArray(orders) || orders.length === 0) && /^\d+$/.test(cleanNumber)) {
+        const intStr = parseInt(cleanNumber, 10).toString();
+        if (intStr !== cleanNumber) {
+          console.log(`[Nexus Service] Retrying search with raw integer string (no leading zeros): ${intStr}`);
+          try {
+            const intResponse = await axios.get(`${nexusApiUrl}/api/os`, {
+              params: {
+                number: intStr,
+                os_number: intStr,
+                query: intStr,
+                os: intStr,
+                id: intStr,
+                codigo: intStr,
+                numero: intStr
+              },
+              headers: {
+                'Authorization': `Bearer ${nexusApiKey}`,
+                'X-Workspace-ID': workspaceId,
+                'Content-Type': 'application/json'
+              },
+              timeout: 6000
+            });
+            if (intResponse.data && intResponse.data.length > 0) {
+              orders = intResponse.data;
+            } else {
+              // Try restful /api/os/{intStr}
+              const restIntResponse = await axios.get(`${nexusApiUrl}/api/os/${intStr}`, {
+                headers: {
+                  'Authorization': `Bearer ${nexusApiKey}`,
+                  'X-Workspace-ID': workspaceId,
+                  'Content-Type': 'application/json'
+                },
+                timeout: 5000
+              });
+              if (restIntResponse.data) {
+                orders = Array.isArray(restIntResponse.data) ? restIntResponse.data : [restIntResponse.data];
+              }
+            }
+          } catch (intErr) {
+            console.warn(`[Nexus Service] Integer lookup failed:`, intErr.message);
+          }
+        }
+      }
+
+      // MASTER FALLBACK: If still not found, fetch customer's full OS list by phone and search locally
+      if ((!Array.isArray(orders) || orders.length === 0) && customerPhone) {
+        console.log(`[Nexus Service] Direct OS search returned empty. Trying fallback search in customer's phone OS list: ${customerPhone}`);
+        
+        // We call getOSByPhone using the existing service
+        const phoneResult = await nexusService.getOSByPhone(customerPhone, workspaceId);
+        if (phoneResult.success && Array.isArray(phoneResult.orders) && phoneResult.orders.length > 0) {
+          // Clean the target number for numeric comparison
+          const targetClean = cleanNumber.replace(/\D/g, '');
+          const targetInt = parseInt(targetClean, 10);
+
+          const matchedOrder = phoneResult.orders.find(order => {
+            const num = String(order.os_number || '').trim().toLowerCase();
+            const numClean = num.replace(/\D/g, '');
+            const numInt = parseInt(numClean, 10);
+
+            // Direct match
+            if (num === cleanNumber.toLowerCase()) return true;
+            // Clean digits match
+            if (numClean && targetClean && numClean === targetClean) return true;
+            // Integer value match (e.g. 00022 === 22)
+            if (!isNaN(numInt) && !isNaN(targetInt) && numInt === targetInt) return true;
+            // Substring match
+            if (num.includes(cleanNumber.toLowerCase()) || cleanNumber.toLowerCase().includes(num)) return true;
+
+            return false;
+          });
+
+          if (matchedOrder) {
+            console.log(`[Nexus Service] Master Fallback successfully found matching OS locally:`, matchedOrder.os_number);
+            return {
+              success: true,
+              is_mock: phoneResult.is_mock,
+              orders: [matchedOrder]
+            };
+          }
         }
       }
 
