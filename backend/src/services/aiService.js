@@ -203,11 +203,12 @@ const aiTools = [
     type: 'function',
     function: {
       name: 'check_nexus_os',
-      description: 'Checks the real-time status of the customer\'s active service order (O.S.) in the Nexus ERP system. CALL THIS whenever a customer asks about their repair status, order status, or if their device is ready.',
+      description: 'Checks the real-time status of active service orders (O.S.) in the Nexus ERP system. CALL THIS whenever a customer asks about their repair status, order status, provides a specific OS number/ID, or asks if their device is ready.',
       parameters: {
         type: 'object',
         properties: {
-          customer_phone: { type: 'string', description: 'The phone number of the customer (optional, defaults to current customer phone)' }
+          customer_phone: { type: 'string', description: 'The phone number of the customer (optional)' },
+          os_number: { type: 'string', description: 'The specific O.S. number/ID provided by the customer, e.g. "00022" or "NXS-2026-9810" (optional)' }
         }
       }
     }
@@ -243,12 +244,22 @@ const executeTool = async (toolName, toolArgs, workspaceId) => {
  */
 const checkNexusOSInERP = async (args, workspaceId) => {
   try {
-    const { customer_phone } = args;
-    if (!customer_phone) {
-      return JSON.stringify({ success: false, error: 'Customer phone number is required' });
+    const { customer_phone, os_number } = args;
+    const nexusService = require('./nexusService');
+
+    // If an OS number was explicitly provided, search by number
+    if (os_number) {
+      console.log(`[AI Tool] Searching Nexus OS by number: ${os_number}`);
+      const osResult = await nexusService.getOSByNumber(os_number, workspaceId);
+      return JSON.stringify(osResult);
     }
 
-    const nexusService = require('./nexusService');
+    // Otherwise, search by customer phone number
+    if (!customer_phone) {
+      return JSON.stringify({ success: false, error: 'Customer phone number or OS number is required' });
+    }
+
+    console.log(`[AI Tool] Searching Nexus OS by phone: ${customer_phone}`);
     const osResult = await nexusService.getOSByPhone(customer_phone, workspaceId);
     return JSON.stringify(osResult);
   } catch (err) {
