@@ -18,12 +18,12 @@ services:
     labels:
       - "traefik.enable=true"
       # Router HTTPS (Secure)
-      - "traefik.http.routers.alice-api.rule=(Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`)) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api.rule=(Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`) || Host(`www.aliceinteligence.com`) || Host(`www.aliceintelligence.com`)) && PathPrefix(`/api`)"
       - "traefik.http.routers.alice-api.entrypoints=websecure"
       - "traefik.http.routers.alice-api.tls.certresolver=letsencrypt"
       - "traefik.http.services.alice-api.loadbalancer.server.port=3000"
       # Router HTTP (Redirect to HTTPS)
-      - "traefik.http.routers.alice-api-http.rule=(Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`)) && PathPrefix(`/api`)"
+      - "traefik.http.routers.alice-api-http.rule=(Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`) || Host(`www.aliceinteligence.com`) || Host(`www.aliceintelligence.com`)) && PathPrefix(`/api`)"
       - "traefik.http.routers.alice-api-http.entrypoints=web"
       - "traefik.http.routers.alice-api-http.middlewares=redirect-to-https"
 
@@ -39,12 +39,12 @@ services:
     labels:
       - "traefik.enable=true"
       # Router HTTPS (Secure)
-      - "traefik.http.routers.alice-frontend.rule=Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`)"
+      - "traefik.http.routers.alice-frontend.rule=Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`) || Host(`www.aliceinteligence.com`) || Host(`www.aliceintelligence.com`)"
       - "traefik.http.routers.alice-frontend.entrypoints=websecure"
       - "traefik.http.routers.alice-frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.alice-frontend.loadbalancer.server.port=80"
       # Router HTTP (Redirect to HTTPS)
-      - "traefik.http.routers.alice-frontend-http.rule=Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`)"
+      - "traefik.http.routers.alice-frontend-http.rule=Host(`aliceintelligence.com`) || Host(`aliceinteligence.com`) || Host(`www.aliceinteligence.com`) || Host(`www.aliceintelligence.com`)"
       - "traefik.http.routers.alice-frontend-http.entrypoints=web"
       - "traefik.http.routers.alice-frontend-http.middlewares=redirect-to-https"
       # Definicao do Middleware de Redirecionamento
