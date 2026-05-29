@@ -990,6 +990,28 @@ Data de hoje: ${getBrazilDateTime().dateStr}`
  */
 const processIncomingMessage = async (messageText, workspaceId, conversationId = null, customerContext = null) => {
   try {
+    // If customerContext is not supplied but conversationId is, automatically load it from the DB
+    if (!customerContext && conversationId) {
+      try {
+        const { data: conv } = await supabase
+          .from('conversations')
+          .select('*, customers(*)')
+          .eq('id', conversationId)
+          .single();
+          
+        if (conv?.customers) {
+          customerContext = {
+            id: conv.customers.id,
+            name: conv.customers.name,
+            phone: conv.customers.whatsapp || conv.customers.phone
+          };
+          console.log(`[AI Service] Resolved customerContext automatically: ID ${customerContext.id}, Name: ${customerContext.name}, Phone: ${customerContext.phone}`);
+        }
+      } catch (convErr) {
+        console.error('[AI Service] Error resolving customerContext from conversationId:', convErr.message);
+      }
+    }
+
     // 1. Parallel fetch of all context data
     const fetchPromises = [
       evaluateSentimentAndIntent(messageText),
