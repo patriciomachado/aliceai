@@ -67,6 +67,14 @@ router.post('/', requireAuth, validate(appointmentSchema), async (req, res, next
 
     if (error) throw error;
 
+    // Synchronize newly created appointment to Nexus ERP
+    try {
+      const nexusService = require('../../services/nexusService');
+      await nexusService.syncAppointmentToNexus(appointment, appointment.customers, req.workspaceId);
+    } catch (nexusErr) {
+      console.error('[Appointments Route] Nexus sync error:', nexusErr.message);
+    }
+
     // Trigger background automation workflow
     try {
       const automationService = require('../../services/automationService');

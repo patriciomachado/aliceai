@@ -467,6 +467,15 @@ const createAppointmentInDB = async (args, workspaceId) => {
     }
 
     console.log(`[AI Tool] ✅ Appointment created for ${customer.name}: ${service_type} on ${scheduled_date} at ${scheduled_time}`);
+
+    // Synchronize newly created appointment to Nexus ERP
+    try {
+      const nexusService = require('./nexusService');
+      await nexusService.syncAppointmentToNexus(appointment, customer, workspaceId);
+    } catch (nexusErr) {
+      console.error('[AI Service Appointment Tool] Nexus sync error:', nexusErr.message);
+    }
+
     return JSON.stringify({
       success: true,
       appointment_id: appointment.id,

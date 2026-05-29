@@ -97,6 +97,71 @@ const nexusService = {
   },
 
   /**
+   * Synchronize a newly created appointment from Alice to Nexus ERP
+   */
+  syncAppointmentToNexus: async (appointment, customer, workspaceId) => {
+    try {
+      // Get workspace settings to retrieve Nexus configuration
+      const { data: workspace, error: wsErr } = await supabase
+        .from('workspaces')
+        .select('settings')
+        .eq('id', workspaceId)
+        .maybeSingle();
+
+      if (wsErr || !workspace) {
+        throw new Error('Workspace settings not found');
+      }
+
+      const settings = workspace.settings || {};
+      const nexusApiUrl = settings.nexus_api_url;
+      const nexusApiKey = settings.nexus_api_key;
+
+      if (!nexusApiUrl) {
+        console.log(`[Nexus Service] Nexus API not configured for workspace ${workspaceId}. Skipping API call, returning graceful mock sync success.`);
+        return { success: true, is_mock: true, message: 'Nexus não configurado nas configurações. Simulação de sincronização com sucesso.' };
+      }
+
+      console.log(`[Nexus Service] Synchronizing appointment ${appointment.id} to Nexus ERP API: ${nexusApiUrl}`);
+
+      // Call the real Nexus ERP API to create the appointment
+      const response = await axios.post(`${nexusApiUrl}/api/appointments`, {
+        appointment_id: appointment.id,
+        service_type: appointment.service_type,
+        scheduled_date: appointment.scheduled_date,
+        scheduled_time: appointment.scheduled_time,
+        notes: appointment.notes,
+        customer: {
+          id: customer.id,
+          name: customer.name,
+          email: customer.email,
+          phone: customer.phone || customer.whatsapp
+        }
+      }, {
+        headers: {
+          'Authorization': `Bearer ${nexusApiKey}`,
+          'X-Workspace-ID': workspaceId,
+          'Content-Type': 'application/json'
+        },
+        timeout: 8500
+      });
+
+      return {
+        success: true,
+        is_mock: false,
+        data: response.data
+      };
+
+    } catch (err) {
+      console.error('[Nexus Service] syncAppointmentToNexus error:', err.message);
+      return {
+        success: false,
+        error: `Erro ao enviar agendamento para o Nexus: ${err.message}`,
+        message: 'Ocorreu uma falha ao sincronizar o agendamento com o Nexus. Salvo localmente para re-tentativa.'
+      };
+    }
+  },
+
+  /**
    * Synchronize catalog from Nexus ERP to Alice Database
    */
   syncCatalog: async (items, workspaceId) => {
