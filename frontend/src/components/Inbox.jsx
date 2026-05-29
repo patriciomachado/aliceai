@@ -40,10 +40,6 @@ const Inbox = () => {
     }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, activeConvId]);
-
   // 1. Fetch conversations
   const { data: conversations = [], isLoading: convsLoading } = useQuery({
     queryKey: ['conversations'],
@@ -67,6 +63,10 @@ const Inbox = () => {
     refetchInterval: 1500, // Refetch active thread messages every 1.5 seconds for real-time synchronization
     refetchIntervalInBackground: true
   });
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, activeConvId]);
 
   // 3. Mutator for sending a new message (manual reply / simulation)
   const sendMsgMutation = useMutation({
