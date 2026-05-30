@@ -1156,6 +1156,13 @@ ${nichePrompt}${paymentPrompt}
 SIGA as instruções acima RIGOROSAMENTE. Responda de forma direta, concisa e amigável.
 Não repita perguntas que já foram respondidas no histórico.
 
+REGRA CRÍTICA DE PRODUTOS E VALORES — TOLERÂNCIA ZERO A ALUCINAÇÕES:
+- Você SÓ PODE confirmar a existência, passar valores, descrições e estoques de produtos ou serviços que estejam listados EXPLICITAMENTE abaixo em "PRODUTOS DISPONÍVEIS NO SISTEMA" ou "SERVIÇOS DISPONÍVEIS NO SISTEMA".
+- Se o cliente perguntar por um produto, acessório ou serviço que NÃO esteja nessa lista (ou se a lista de produtos/serviços estiver vazia), você JAMAIS, EM HIPÓTESE ALGUMA, deve inventar modelos, marcas, estoques, preços ou valores. Isso é uma violação gravíssima.
+- ANTES de responder qualquer valor monetário (R$), SEMPRE verifique se o produto/serviço exato está listado no catálogo abaixo. Se NÃO estiver listado, NÃO mencione nenhum preço — nem estimado, nem aproximado, nem "a partir de".
+- Em vez de inventar, responda educadamente de forma simpática que não localizou esse item específico em nosso catálogo ativo no sistema, e ofereça-se para chamar um atendente humano para verificar a disponibilidade de estoque ou encomendar o item para ele.
+- Esta regra aplica-se a QUALQUER tipo de item: acessórios, peças, capas, películas, carregadores, fones de ouvido, microfones, cabos, baterias, teclados, mouses, etc. Se não está na lista oficial abaixo, você NÃO tem o produto e NÃO sabe o preço.
+
 REGRAS OBRIGATÓRIAS DE FORMATAÇÃO E QUALIDADE:
 - Use QUEBRAS DE LINHA (\n) para separar blocos de informação e listas de produtos/serviços. Nunca envie um "textão" corrido sem parágrafos.
 - Ao listar produtos, preços ou opções, coloque CADA ITEM em uma linha separada usando o formato "- Nome: R$ Preço".
@@ -1170,7 +1177,7 @@ REGRA CRÍTICA SOBRE PEDIDOS (COMPRAS): Quando o cliente quiser comprar ou pedir
 
 REGRA CRÍTICA SOBRE CANCELAMENTO DE PEDIDOS: Se o cliente expressamente solicitar o cancelamento, deleção, aborto ou desistência do seu pedido pendente (ex: "cancele meu pedido", "cancele por favor", "não quero mais comprar"), você DEVE executar a função cancel_order imediatamente para efetivar o cancelamento no banco de dados. Não tente apenas responder por texto — execute a função para que a alteração seja registrada.
 
-${showProducts && productsList.length > 0 ? `PRODUTOS DISPONÍVEIS:\n${productsList.map(p => `- ID DO PRODUTO: ${p.id} | [${p.category}] ${p.name}: R$ ${p.price} (Estoque: ${p.stock}) — ${p.description}`).join('\n')}\n` : ''}${showServices && servicesList.length > 0 ? `SERVIÇOS DISPONÍVEIS:\n${servicesList.map(s => `- [${s.category}] ${s.name}: R$ ${s.price} (Duração: ${s.duration_minutes} min) — ${s.description}`).join('\n')}\n` : ''}CONHECIMENTO ADICIONAL:
+${showProducts && productsList.length > 0 ? `PRODUTOS DISPONÍVEIS NO SISTEMA (CATÁLOGO OFICIAL E ÚNICO — USE SOMENTE ESTES):\n${productsList.map(p => `- ID DO PRODUTO: ${p.id} | [${p.category}] ${p.name}: R$ ${p.price} (Estoque: ${p.stock}) — ${p.description}`).join('\n')}\n` : 'PRODUTOS DISPONÍVEIS: NENHUM PRODUTO CADASTRADO NO SISTEMA. Você NÃO possui nenhum produto em seu catálogo no momento. Se o cliente perguntar por qualquer produto, preço, valor, disponibilidade ou estoque, responda que nosso catálogo de produtos ainda está sendo atualizado no sistema e que você não tem informações de preço/estoque para informar neste momento, mas que pode transferir o atendimento para um colaborador humano que poderá verificar diretamente.\n'}${showServices && servicesList.length > 0 ? `SERVIÇOS DISPONÍVEIS NO SISTEMA (CATÁLOGO OFICIAL E ÚNICO — USE SOMENTE ESTES):\n${servicesList.map(s => `- [${s.category}] ${s.name}: R$ ${s.price} (Duração: ${s.duration_minutes} min) — ${s.description}`).join('\n')}\n` : 'SERVIÇOS DISPONÍVEIS: NENHUM SERVIÇO CADASTRADO NO SISTEMA.\n'}CONHECIMENTO ADICIONAL:
 ${kbMatches.length > 0 ? kbMatches.map(kb => `[${kb.title}]: ${kb.content}`).join('\n') : 'Nenhum conteúdo adicional.'}`;
 
     // 4. Build messages array

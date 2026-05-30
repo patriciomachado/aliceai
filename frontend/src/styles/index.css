@@ -172,48 +172,509 @@
   @apply bg-white/10 rounded-full hover:bg-white/20;
 }
 
-/* Light mode semantic overrides for high contrast compatibility */
-html:not(.dark) .text-white {
-  color: hsl(var(--foreground)) !important;
-}
-html:not(.dark) .text-white\/80 {
-  color: hsla(var(--foreground) / 0.8) !important;
-}
-html:not(.dark) .text-white\/60 {
-  color: hsla(var(--foreground) / 0.6) !important;
-}
-html:not(.dark) .text-white\/50 {
-  color: hsla(var(--foreground) / 0.5) !important;
-}
-html:not(.dark) .text-white\/40 {
-  color: hsla(var(--foreground) / 0.4) !important;
-}
-html:not(.dark) .text-white\/30 {
-  color: hsla(var(--foreground) / 0.3) !important;
-}
-html:not(.dark) .border-white\/5 {
-  border-color: rgba(0, 0, 0, 0.05) !important;
-}
-html:not(.dark) .border-white\/10 {
-  border-color: rgba(0, 0, 0, 0.08) !important;
-}
-html:not(.dark) .bg-white\/5 {
-  background-color: rgba(0, 0, 0, 0.02) !important;
-}
-html:not(.dark) .bg-white\/10 {
-  background-color: rgba(0, 0, 0, 0.05) !important;
-}
-html:not(.dark) .bg-white\/20 {
-  background-color: rgba(0, 0, 0, 0.08) !important;
-}
-html:not(.dark) .glass-panel {
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08) !important;
-}
-html:not(.dark) .glass-input {
-  color: hsl(var(--foreground)) !important;
-  border-color: rgba(0, 0, 0, 0.1) !important;
-}
-html:not(.dark) .glass-input::placeholder {
-  color: rgba(0, 0, 0, 0.4) !important;
+/* ========================================================================= */
+/* LIGHT MODE: Comprehensive Semantic Overrides                              */
+/* All overrides for html:not(.dark) to ensure premium contrast/readability   */
+/* ========================================================================= */
+
+html:not(.dark) body {
+  color: #0f172a !important;
 }
 
+/* ─── Glass Panel Base ───────────────────────────────────────────────────── */
+html:not(.dark) .glass-panel {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04), 0 2px 8px -1px rgba(0, 0, 0, 0.02) !important;
+}
+
+/* ─── Modal / Fixed Overlay Panels: Pure Opaque White ────────────────────── */
+html:not(.dark) .fixed .glass-panel,
+html:not(.dark) .fixed .bg-slate-900,
+html:not(.dark) .fixed .bg-white,
+html:not(.dark) .glass-panel.bg-white,
+html:not(.dark) .glass-panel.bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ─── Modal/Dialog Backdrop Overlays ─────────────────────────────────────── */
+html:not(.dark) .bg-black\/60,
+html:not(.dark) .bg-black\/70 {
+  background-color: rgba(15, 23, 42, 0.18) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+/* ─── 3-Column Inbox Layout (depth differentiation) ──────────────────────── */
+html:not(.dark) .bg-slate-950\/30 {
+  background-color: rgba(255, 255, 255, 0.45) !important;
+}
+html:not(.dark) .bg-slate-950\/40 {
+  background-color: #f8fafc !important;
+  border-color: rgba(0, 0, 0, 0.05) !important;
+}
+html:not(.dark) .bg-slate-950\/20 {
+  background-color: #ffffff !important;
+}
+html:not(.dark) .bg-slate-950\/10 {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* ─── Broad Slate Background Mapping ─────────────────────────────────────── */
+html:not(.dark) .bg-slate-950,
+html:not(.dark) .bg-slate-950\/50,
+html:not(.dark) .bg-slate-950\/60,
+html:not(.dark) .bg-slate-950\/70,
+html:not(.dark) .bg-slate-950\/80,
+html:not(.dark) .bg-slate-950\/90 {
+  background-color: #f8fafc !important;
+}
+
+html:not(.dark) .bg-slate-900 {
+  background-color: #ffffff !important;
+}
+html:not(.dark) .bg-slate-900\/50,
+html:not(.dark) .bg-slate-900\/70,
+html:not(.dark) .bg-slate-900\/80,
+html:not(.dark) .bg-slate-900\/90 {
+  background-color: #ffffff !important;
+}
+html:not(.dark) .bg-slate-900\/10,
+html:not(.dark) .bg-slate-900\/20,
+html:not(.dark) .bg-slate-900\/30 {
+  background-color: rgba(241, 245, 249, 0.5) !important;
+}
+html:not(.dark) .bg-slate-900\/40 {
+  background-color: #ffffff !important;
+}
+
+/* CRM Details sections */
+html:not(.dark) .bg-slate-900\/50.border.border-white\/5 {
+  background-color: #ffffff !important;
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ─── White-Alpha / Black-Alpha Background Overrides ─────────────────────── */
+/* These classes (bg-white/5, bg-white/10, bg-black/40) are heavily used in   */
+/* dark-first components as subtle tints. In light mode, map to visible but   */
+/* soft contrasts.                                                           */
+html:not(.dark) .bg-white\/5 {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+html:not(.dark) .bg-white\/10 {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+html:not(.dark) .bg-white\/15 {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+html:not(.dark) .bg-white\/20 {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+html:not(.dark) .bg-black\/5 {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+html:not(.dark) .bg-black\/10 {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+html:not(.dark) .bg-black\/40 {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+
+/* ─── Hex Hardcoded Dark Backgrounds ─────────────────────────────────────── */
+html:not(.dark) .bg-\[\#0f111c\]\/60,
+html:not(.dark) .bg-\[\#0f111c\],
+html:not(.dark) .bg-\[\#090a0f\],
+html:not(.dark) .bg-\[\#0d0e16\],
+html:not(.dark) .bg-\[\#0d0e16\]\/90 {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* ─── Kanban / Status Column Backgrounds ─────────────────────────────────── */
+html:not(.dark) .bg-amber-950\/5,
+html:not(.dark) .bg-amber-950\/10 {
+  background-color: rgba(245, 158, 11, 0.04) !important;
+}
+html:not(.dark) .bg-indigo-950\/5,
+html:not(.dark) .bg-indigo-950\/10 {
+  background-color: rgba(99, 102, 241, 0.04) !important;
+}
+html:not(.dark) .bg-emerald-950\/5,
+html:not(.dark) .bg-emerald-950\/10 {
+  background-color: rgba(16, 185, 129, 0.04) !important;
+}
+html:not(.dark) .bg-red-950\/5,
+html:not(.dark) .bg-red-950\/10,
+html:not(.dark) .bg-red-950\/20,
+html:not(.dark) .bg-red-950\/40 {
+  background-color: rgba(239, 68, 68, 0.04) !important;
+}
+
+/* Status / Badge Soft Backgrounds */
+html:not(.dark) .bg-indigo-500\/10 {
+  background-color: rgba(99, 102, 241, 0.08) !important;
+}
+html:not(.dark) .bg-emerald-500\/10 {
+  background-color: rgba(16, 185, 129, 0.08) !important;
+}
+html:not(.dark) .bg-amber-500\/10 {
+  background-color: rgba(245, 158, 11, 0.08) !important;
+}
+html:not(.dark) .bg-red-500\/10 {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+}
+html:not(.dark) .bg-red-500\/5 {
+  background-color: rgba(239, 68, 68, 0.05) !important;
+}
+html:not(.dark) .bg-purple-500\/10 {
+  background-color: rgba(168, 85, 247, 0.08) !important;
+}
+
+/* Gradient tint cards (Dashboard KPI cards, etc.) */
+html:not(.dark) .from-emerald-500\/20 { --tw-gradient-from: rgba(16, 185, 129, 0.08) var(--tw-gradient-from-position) !important; }
+html:not(.dark) .to-teal-500\/10 { --tw-gradient-to: rgba(20, 184, 166, 0.04) var(--tw-gradient-to-position) !important; }
+html:not(.dark) .from-indigo-500\/20 { --tw-gradient-from: rgba(99, 102, 241, 0.08) var(--tw-gradient-from-position) !important; }
+html:not(.dark) .to-purple-500\/10 { --tw-gradient-to: rgba(168, 85, 247, 0.04) var(--tw-gradient-to-position) !important; }
+html:not(.dark) .from-blue-500\/20 { --tw-gradient-from: rgba(59, 130, 246, 0.08) var(--tw-gradient-from-position) !important; }
+html:not(.dark) .to-cyan-500\/10 { --tw-gradient-to: rgba(6, 182, 212, 0.04) var(--tw-gradient-to-position) !important; }
+html:not(.dark) .from-pink-500\/20 { --tw-gradient-from: rgba(236, 72, 153, 0.08) var(--tw-gradient-from-position) !important; }
+html:not(.dark) .to-rose-500\/10 { --tw-gradient-to: rgba(244, 63, 94, 0.04) var(--tw-gradient-to-position) !important; }
+
+/* ─── Delete Confirmation Modal (Appointments, etc.) ─────────────────────── */
+html:not(.dark) .from-\[\#1c0c10\],
+html:not(.dark) .to-\[\#0a0a0f\],
+html:not(.dark) .bg-gradient-to-b.from-\[\#1c0c10\].to-\[\#0a0a0f\] {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* ─── Buttons and Select Overrides ───────────────────────────────────────── */
+html:not(.dark) .glass-btn-secondary {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+  color: #334155 !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+html:not(.dark) .glass-btn-secondary:hover {
+  background-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Sidebar elements */
+html:not(.dark) .hover\:bg-white\/5:hover {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+html:not(.dark) .hover\:bg-white\/10:hover {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+html:not(.dark) .divide-white\/5 > * + * {
+  border-color: rgba(0, 0, 0, 0.05) !important;
+}
+html:not(.dark) .border-l-transparent {
+  border-left-color: transparent !important;
+}
+
+/* ─── Inputs, Textareas, Selects, Date/Time pickers ──────────────────────── */
+html:not(.dark) input[type="text"],
+html:not(.dark) input[type="email"],
+html:not(.dark) input[type="password"],
+html:not(.dark) input[type="number"],
+html:not(.dark) input[type="date"],
+html:not(.dark) input[type="time"],
+html:not(.dark) input[type="search"],
+html:not(.dark) textarea,
+html:not(.dark) select,
+html:not(.dark) .glass-input {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+html:not(.dark) input[type="text"]:focus,
+html:not(.dark) input[type="email"]:focus,
+html:not(.dark) input[type="password"]:focus,
+html:not(.dark) input[type="number"]:focus,
+html:not(.dark) input[type="date"]:focus,
+html:not(.dark) input[type="time"]:focus,
+html:not(.dark) input[type="search"]:focus,
+html:not(.dark) textarea:focus,
+html:not(.dark) select:focus,
+html:not(.dark) .glass-input:focus {
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15) !important;
+}
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder,
+html:not(.dark) .glass-input::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Select option dropdown backgrounds */
+html:not(.dark) option,
+html:not(.dark) option.bg-\[\#090a0f\] {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Search bar inside KnowledgeBase and other modules */
+html:not(.dark) input.bg-white\/5,
+html:not(.dark) .bg-white\/5[class*="border"][class*="rounded"] {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* KnowledgeBase text editor fields */
+html:not(.dark) .bg-white\/5.border.border-white\/10 {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* Checkbox styling */
+html:not(.dark) input[type="checkbox"] {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* ─── Font Color Overrides: White → Slate ────────────────────────────────── */
+html:not(.dark) .text-white {
+  color: #0f172a !important;
+}
+html:not(.dark) .text-white\/95 {
+  color: #0f172a !important;
+}
+html:not(.dark) .text-white\/90 {
+  color: #1e293b !important;
+}
+html:not(.dark) .text-white\/80 {
+  color: #334155 !important;
+}
+html:not(.dark) .text-white\/75 {
+  color: #475569 !important;
+}
+html:not(.dark) .text-white\/70 {
+  color: #475569 !important;
+}
+html:not(.dark) .text-white\/60 {
+  color: #64748b !important;
+}
+html:not(.dark) .text-white\/50 {
+  color: #64748b !important;
+}
+html:not(.dark) .text-white\/40 {
+  color: #94a3b8 !important;
+}
+html:not(.dark) .text-white\/30 {
+  color: #94a3b8 !important;
+}
+html:not(.dark) .text-white\/20 {
+  color: #cbd5e1 !important;
+}
+html:not(.dark) .text-white\/10 {
+  color: #e2e8f0 !important;
+}
+
+/* Placeholder text color for white-based placeholders */
+html:not(.dark) .placeholder-white\/30::placeholder,
+html:not(.dark) .placeholder-white\/40::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* ─── Border & Divider Overrides ─────────────────────────────────────────── */
+html:not(.dark) .border-white\/5,
+html:not(.dark) .border-white\/10,
+html:not(.dark) .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.06) !important;
+}
+html:not(.dark) .border-indigo-500\/20 {
+  border-color: rgba(99, 102, 241, 0.15) !important;
+}
+html:not(.dark) .border-emerald-500\/20 {
+  border-color: rgba(16, 185, 129, 0.15) !important;
+}
+html:not(.dark) .border-amber-500\/20 {
+  border-color: rgba(245, 158, 11, 0.15) !important;
+}
+html:not(.dark) .border-red-500\/20 {
+  border-color: rgba(239, 68, 68, 0.15) !important;
+}
+html:not(.dark) .border-red-500\/10 {
+  border-color: rgba(239, 68, 68, 0.1) !important;
+}
+html:not(.dark) .border-red-900\/30 {
+  border-color: rgba(239, 68, 68, 0.12) !important;
+}
+html:not(.dark) .border-dashed.border-white\/5 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* ─── Status Colors Override for High Contrast ───────────────────────────── */
+html:not(.dark) .text-emerald-400 {
+  color: #047857 !important;
+}
+html:not(.dark) .text-red-400 {
+  color: #b91c1c !important;
+}
+html:not(.dark) .text-amber-400 {
+  color: #b45309 !important;
+}
+html:not(.dark) .text-indigo-400 {
+  color: #4338ca !important;
+}
+html:not(.dark) .text-purple-400 {
+  color: #6d28d9 !important;
+}
+html:not(.dark) .text-emerald-300 {
+  color: #047857 !important;
+}
+html:not(.dark) .text-indigo-300 {
+  color: #4338ca !important;
+}
+html:not(.dark) .text-red-500 {
+  color: #dc2626 !important;
+}
+
+/* ─── Chat Bubble Overrides ──────────────────────────────────────────────── */
+/* Customer chat bubble (soft clean off-white grey) */
+html:not(.dark) .bg-slate-900\/50.border.border-white\/5.text-white\/95 {
+  background-color: #f1f5f9 !important;
+  border-color: rgba(0, 0, 0, 0.05) !important;
+  color: #0f172a !important;
+}
+
+/* AI Agent chat bubble (lilás pastel premium with purple text) */
+html:not(.dark) .bg-gradient-to-r.from-fuchsia-950\/30.to-purple-950\/30,
+html:not(.dark) [class*="bg-gradient-to-r"][class*="fuchsia-950"] {
+  background: linear-gradient(135deg, #fae8ff 0%, #f3e8ff 100%) !important;
+  border-color: rgba(168, 85, 247, 0.18) !important;
+  color: #581c87 !important;
+}
+
+/* ─── Glow Card Effects (soften in light mode) ───────────────────────────── */
+html:not(.dark) .glow-card::after {
+  opacity: 0 !important;
+}
+html:not(.dark) .glow-card:hover::after {
+  opacity: 0.04 !important;
+}
+
+/* Shadow glowing effect (soften in light mode) */
+html:not(.dark) .shadow-glowing {
+  box-shadow: 0 0 15px 2px rgba(99, 102, 241, 0.15) !important;
+}
+
+/* ─── Recharts / Chart Grid Adaptation ───────────────────────────────────── */
+html:not(.dark) .recharts-cartesian-grid line {
+  stroke: #e2e8f0 !important;
+}
+html:not(.dark) .recharts-text {
+  fill: #64748b !important;
+}
+
+/* ========================================================================= */
+/* CRITICAL EXCEPTION RULES: Keep texts WHITE for dark/colored backgrounds   */
+/* ========================================================================= */
+html:not(.dark) .glass-btn-primary,
+html:not(.dark) .glass-btn-primary *,
+html:not(.dark) button[type="submit"],
+html:not(.dark) button[type="submit"] *,
+html:not(.dark) button.bg-indigo-600,
+html:not(.dark) button.bg-indigo-600 *,
+html:not(.dark) button.bg-purple-600,
+html:not(.dark) button.bg-purple-600 *,
+html:not(.dark) button.bg-red-600,
+html:not(.dark) button.bg-red-600 *,
+html:not(.dark) button.bg-emerald-600,
+html:not(.dark) button.bg-emerald-600 *,
+html:not(.dark) button.bg-red-500,
+html:not(.dark) button.bg-red-500 *,
+html:not(.dark) .bg-gradient-to-r.from-indigo-600.to-violet-600,
+html:not(.dark) .bg-gradient-to-r.from-indigo-600.to-violet-600 *,
+html:not(.dark) .bg-indigo-600,
+html:not(.dark) .bg-indigo-600 *,
+html:not(.dark) .bg-purple-600,
+html:not(.dark) .bg-purple-600 *,
+html:not(.dark) .bg-violet-600,
+html:not(.dark) .bg-violet-600 *,
+html:not(.dark) .from-indigo-600 *,
+html:not(.dark) .from-indigo-600,
+html:not(.dark) .from-purple-600 *,
+html:not(.dark) .from-purple-600,
+html:not(.dark) .bg-emerald-500,
+html:not(.dark) .bg-emerald-500 *,
+html:not(.dark) .bg-emerald-600,
+html:not(.dark) .bg-emerald-600 *,
+html:not(.dark) .bg-red-500,
+html:not(.dark) .bg-red-500 *,
+html:not(.dark) .bg-red-600,
+html:not(.dark) .bg-red-600 *,
+html:not(.dark) .bg-indigo-500,
+html:not(.dark) .bg-indigo-500 *,
+html:not(.dark) .bg-violet-500,
+html:not(.dark) .bg-violet-500 *,
+html:not(.dark) .bg-purple-500,
+html:not(.dark) .bg-purple-500 *,
+html:not(.dark) [class*="bg-indigo-"]:not([class*="bg-indigo-500/10"]):not([class*="bg-indigo-950/"]),
+html:not(.dark) [class*="bg-indigo-"]:not([class*="bg-indigo-500/10"]):not([class*="bg-indigo-950/"]) *,
+html:not(.dark) [class*="bg-purple-"]:not([class*="bg-purple-500/10"]):not([class*="bg-purple-950/"]),
+html:not(.dark) [class*="bg-purple-"]:not([class*="bg-purple-500/10"]):not([class*="bg-purple-950/"]) *,
+html:not(.dark) [class*="bg-violet-"]:not([class*="bg-violet-500/10"]):not([class*="bg-violet-950/"]),
+html:not(.dark) [class*="bg-violet-"]:not([class*="bg-violet-500/10"]):not([class*="bg-violet-950/"]) *,
+html:not(.dark) [class*="bg-emerald-"]:not([class*="bg-emerald-500/10"]):not([class*="bg-emerald-950/"]),
+html:not(.dark) [class*="bg-emerald-"]:not([class*="bg-emerald-500/10"]):not([class*="bg-emerald-950/"]) *,
+html:not(.dark) [class*="bg-red-"]:not([class*="bg-red-500/10"]):not([class*="bg-red-500/5"]):not([class*="bg-red-950/"]),
+html:not(.dark) [class*="bg-red-"]:not([class*="bg-red-500/10"]):not([class*="bg-red-500/5"]):not([class*="bg-red-950/"]) *,
+html:not(.dark) [class*="from-indigo-"] *,
+html:not(.dark) [class*="from-purple-"] *,
+html:not(.dark) [class*="from-violet-"] * {
+  color: #ffffff !important;
+}
+
+/* ─── Fix text inside badges/status labels that SHOULDN'T be white ────────── */
+html:not(.dark) .bg-indigo-500\/10 .text-indigo-400,
+html:not(.dark) .bg-indigo-500\/10 .text-indigo-300 {
+  color: #4338ca !important;
+}
+html:not(.dark) .bg-emerald-500\/10 .text-emerald-400 {
+  color: #047857 !important;
+}
+html:not(.dark) .bg-amber-500\/10 .text-amber-400 {
+  color: #b45309 !important;
+}
+html:not(.dark) .bg-red-500\/10 .text-red-400 {
+  color: #b91c1c !important;
+}
+html:not(.dark) .bg-red-500\/5 .text-red-500 {
+  color: #dc2626 !important;
+}
+html:not(.dark) .bg-red-950\/20 .text-red-400,
+html:not(.dark) .bg-red-950\/40 .text-red-400 {
+  color: #b91c1c !important;
+}
+html:not(.dark) .bg-amber-500\/10 .text-amber-400,
+html:not(.dark) .bg-amber-500\/20 .text-amber-400 {
+  color: #b45309 !important;
+}
+
+/* ─── Fix text inside KPI icon containers ────────────────────────────────── */
+html:not(.dark) .p-3.bg-white\/5 .text-indigo-400 {
+  color: #4338ca !important;
+}
+
+/* ─── Fix hover bg for action buttons (edit/delete) that use white-alpha ──── */
+html:not(.dark) .bg-white\/5:hover,
+html:not(.dark) .hover\:bg-white\/10:hover {
+  background-color: rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Text inside action buttons (Edit/Cancel with bg-white/5) */
+html:not(.dark) .bg-white\/5.text-white\/75,
+html:not(.dark) .bg-white\/5.text-white\/60,
+html:not(.dark) .bg-white\/5.text-white\/70 {
+  color: #475569 !important;
+}
+
+/* ─── Glass shadow override ──────────────────────────────────────────────── */
+html:not(.dark) .shadow-glass {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04) !important;
+}
