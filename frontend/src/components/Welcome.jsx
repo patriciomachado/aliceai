@@ -14,9 +14,8 @@ const Welcome = () => {
 
       {/* Left side: Branding & Bento Features */}
       <div className="flex-1 flex flex-col justify-between p-8 lg:p-16 z-10 border-r border-white/5">
-        {/* Header Logo */}
         <div className="flex items-center gap-3">
-          <img src="/logoaliceclean.png" alt="Alice Logo" className="w-10 h-10 object-contain shadow-lg shadow-indigo-600/10" />
+          <img src="/logoaliceclean.png?v=3" alt="Alice Logo" className="w-10 h-10 object-contain bg-transparent shadow-lg shadow-indigo-600/10" />
           <span className="text-xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70 uppercase font-outfit">Alice</span>
         </div>
 

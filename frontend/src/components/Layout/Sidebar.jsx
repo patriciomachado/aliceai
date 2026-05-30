@@ -56,9 +56,8 @@ const Sidebar = () => {
   return (
     <aside className="w-64 h-screen glass-panel rounded-none border-r border-black/5 dark:border-white/5 flex flex-col justify-between p-4 select-none shrink-0">
       <div className="flex flex-col gap-8">
-        {/* Brand/Workspace Logo Panel */}
         <div className="flex items-center gap-3 px-2 py-1">
-          <img src="/logoaliceclean.png" alt="Alice Logo" className="w-9 h-9 object-contain shadow-glowing" />
+          <img src="/logoaliceclean.png?v=3" alt="Alice Logo" className="w-9 h-9 object-contain bg-transparent shadow-glowing" />
           <div className="flex flex-col">
             <span className="text-sm font-bold tracking-wide text-foreground">Alice</span>
             <span className="text-xs text-foreground/50">{activeWorkspace?.name || 'Carregando...'}</span>
