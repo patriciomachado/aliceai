@@ -87,8 +87,17 @@ router.post('/', requireAuth, validate(sendMsgSchema), async (req, res, next) =>
       const channel = conversation.channel;
       const targetPhone = recipient_phone || conversation.customers?.whatsapp || conversation.customers?.phone;
 
-      if (targetPhone && (channel === 'whatsapp' || channel === 'instagram')) {
-        await connectorService.sendMessage(targetPhone, content, channel);
+      if (targetPhone) {
+        if (channel === 'whatsapp') {
+          const whatsappService = require('../../services/whatsappService');
+          const sent = await whatsappService.sendMessageJid(req.workspaceId, targetPhone, content);
+          if (!sent) {
+            console.warn(`[Messages API] Baileys connection offline or failed to send outbound WhatsApp message for workspace ${req.workspaceId}, falling back to connectorService (Meta API).`);
+            await connectorService.sendMessage(targetPhone, content, channel);
+          }
+        } else if (channel === 'instagram') {
+          await connectorService.sendMessage(targetPhone, content, channel);
+        }
       }
 
       // Pause the AI when a manual message is sent from the web app
@@ -181,8 +190,17 @@ router.post('/', requireAuth, validate(sendMsgSchema), async (req, res, next) =>
               
             if (dbReplyError) throw dbReplyError;
             
-            if (recipientPhone && (conversation.channel === 'whatsapp' || conversation.channel === 'instagram')) {
-              await connectorService.sendMessage(recipientPhone, aiResult.reply, conversation.channel);
+            if (recipientPhone) {
+              if (conversation.channel === 'whatsapp') {
+                const whatsappService = require('../../services/whatsappService');
+                const sent = await whatsappService.sendMessageJid(req.workspaceId, recipientPhone, aiResult.reply);
+                if (!sent) {
+                  console.warn(`[Messages API Fallback] Baileys connection offline or failed to send simulated AI WhatsApp reply, falling back to connectorService.`);
+                  await connectorService.sendMessage(recipientPhone, aiResult.reply, conversation.channel);
+                }
+              } else if (conversation.channel === 'instagram') {
+                await connectorService.sendMessage(recipientPhone, aiResult.reply, conversation.channel);
+              }
             }
             
             await supabase

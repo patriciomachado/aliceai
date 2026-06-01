@@ -247,9 +247,29 @@ const connectToWhatsApp = async (workspaceId) => {
                          msg.message?.videoMessage?.caption || 
                          '';
 
-        if (!textBody) {
-          console.log(`[WhatsApp Service - Workspace ${workspaceId}] Skipping empty message body or media message.`);
-          return;
+        let isMedia = false;
+        let contentText = textBody;
+        if (!contentText) {
+          isMedia = true;
+          if (msg.message?.audioMessage) {
+            contentText = '[Áudio]';
+          } else if (msg.message?.imageMessage) {
+            contentText = '[Imagem]';
+          } else if (msg.message?.videoMessage) {
+            contentText = '[Vídeo]';
+          } else if (msg.message?.stickerMessage) {
+            contentText = '[Sticker]';
+          } else if (msg.message?.documentMessage) {
+            contentText = '[Documento]';
+          } else if (msg.message?.contactMessage || msg.message?.contactsArrayMessage) {
+            contentText = '[Contato]';
+          } else if (msg.message?.locationMessage) {
+            contentText = '[Localização]';
+          } else {
+            // Ignore system messages, protocol messages, or other unsupported types
+            console.log(`[WhatsApp Service - Workspace ${workspaceId}] Skipping unsupported empty message protocol type.`);
+            return;
+          }
         }
 
         if (msg.key.id && sentMessageIds.has(msg.key.id)) {
@@ -321,18 +341,18 @@ const connectToWhatsApp = async (workspaceId) => {
 
         // Check if the message is outbound (sent by agent/admin from physical phone)
         if (msg.key.fromMe && !isSelfChat) {
-          console.log(`[WhatsApp Service - Workspace ${workspaceId}] Logging outbound message from phone to customer [${customerPhone}]: "${textBody}"`);
+          console.log(`[WhatsApp Service - Workspace ${workspaceId}] Logging outbound message from phone to customer [${customerPhone}]: "${contentText}"`);
           
           await supabase.from('messages').insert({
             conversation_id: conversation.id,
             sender_type: 'agent',
-            content: textBody
+            content: contentText
           });
 
           // Reply from physical phone (mobile) -> pause AI for 6 hours (360 minutes)
           const pauseDuration = 360;
           const pausedUntil = new Date(Date.now() + pauseDuration * 60 * 1000);
-          console.log(`[WhatsApp Service - Workspace ${workspaceId}] Customer thread [${customerPhone}] PAUSED until ${pausedUntil.toISOString()}`);
+          console.log(`[WhatsApp Service - Workspace ${workspaceId}] Customer thread [${customerPhone}] PAUSED until ${pausedUntil.toISOString()} due to manual outbound message from physical phone.`);
 
           const currentMetadata = customer.metadata || {};
           const updatedMetadata = { ...currentMetadata, ai_paused_until: pausedUntil.toISOString() };
@@ -351,12 +371,24 @@ const connectToWhatsApp = async (workspaceId) => {
         }
 
         // Save physical inbound message to DB first
-        console.log(`[WhatsApp Service - Workspace ${workspaceId}] Logging inbound message from [${customerPhone}]: "${textBody}"`);
+        console.log(`[WhatsApp Service - Workspace ${workspaceId}] Logging inbound message from [${customerPhone}]: "${contentText}"`);
         await supabase.from('messages').insert({
           conversation_id: conversation.id,
           sender_type: 'customer',
-          content: textBody
+          content: contentText
         });
+
+        // If it's an inbound media message, we do not trigger AI (AI cannot process media, and human will handle it)
+        if (isMedia) {
+          console.log(`[WhatsApp Service - Workspace ${workspaceId}] Inbound message is media (${contentText}), skipping AI agent response generation.`);
+          
+          await supabase
+            .from('conversations')
+            .update({ last_message_at: new Date() })
+            .eq('id', conversation.id);
+            
+          return;
+        }
 
         // Trigger background automation workflow
         try {
