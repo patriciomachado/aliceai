@@ -462,9 +462,19 @@ const Inbox = () => {
                         🔕 IA Desativada
                       </span>
                     ) : (activeCustomer?.metadata?.ai_paused_until && new Date(activeCustomer.metadata.ai_paused_until) > new Date()) ? (
-                      <span className="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/25 rounded px-2 py-0.5 font-bold uppercase flex items-center gap-1 animate-pulse">
-                        ⏳ IA Pausada (Atendente Humano)
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => unpauseAIMutation.mutate(activeConvId)}
+                        disabled={unpauseAIMutation.isPending}
+                        title="Clique para reativar a IA imediatamente"
+                        className="text-[9px] bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/25 rounded px-2 py-0.5 font-bold uppercase flex items-center gap-1 animate-pulse transition cursor-pointer active:scale-95 text-amber-400"
+                      >
+                        {unpauseAIMutation.isPending ? (
+                          <div className="w-2.5 h-2.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                        ) : (
+                          '⏳ IA Pausada (Atendente Humano)'
+                        )}
+                      </button>
                     ) : (
                       <span className="text-[9px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 rounded px-2 py-0.5 font-bold uppercase flex items-center gap-1">
                         ✨ IA Monitorando
