@@ -169,6 +169,23 @@ const Inbox = () => {
     }
   });
 
+  // Mutation to resume/unpause AI agent immediately
+  const unpauseAIMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await api.put(`/conversations/${id}/status`, { clear_ai_pause: true });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: ['conversations'] });
+      queryClient.invalidateQueries({ queryKey: ['messages', activeConvId] });
+      showToast('✅ Alice IA reativada com sucesso.');
+    },
+    onError: (error) => {
+      console.error('[Inbox] Erro ao retomar a IA:', error);
+      showToast('Erro ao retomar a IA. Tente novamente.', 'error');
+    }
+  });
+
   // 8. Mutation to update customer info
   const updateCustomerMutation = useMutation({
     mutationFn: async ({ id, name, phone, whatsapp, tags }) => {
@@ -645,11 +662,25 @@ const Inbox = () => {
                 </span>
               </div>
             ) : (activeCustomer?.metadata?.ai_paused_until && new Date(activeCustomer.metadata.ai_paused_until) > new Date()) ? (
-              <div className="mx-6 mt-2 px-4 py-3 bg-amber-500/5 border border-amber-500/15 rounded-xl flex items-center gap-3 text-xs text-amber-400 animate-fade-in shrink-0">
-                <Info className="w-4 h-4 shrink-0 text-amber-400" />
-                <span>
-                  Alice IA está <strong>pausada</strong> até <strong>{new Date(activeCustomer.metadata.ai_paused_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong> devido à sua última intervenção humana.
-                </span>
+              <div className="mx-6 mt-2 px-4 py-3 bg-amber-500/5 border border-amber-500/15 rounded-xl flex items-center justify-between gap-3 text-xs text-amber-400 animate-fade-in shrink-0">
+                <div className="flex items-center gap-3">
+                  <Info className="w-4 h-4 shrink-0 text-amber-400" />
+                  <span>
+                    Alice IA está <strong>pausada</strong> até <strong>{new Date(activeCustomer.metadata.ai_paused_until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</strong> devido à sua última intervenção humana.
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => unpauseAIMutation.mutate(activeConvId)}
+                  disabled={unpauseAIMutation.isPending}
+                  className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 hover:border-amber-500/35 rounded-lg text-[11px] font-bold text-amber-300 transition cursor-pointer active:scale-95 whitespace-nowrap flex items-center gap-1"
+                >
+                  {unpauseAIMutation.isPending ? (
+                    <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    'Retomar IA'
+                  )}
+                </button>
               </div>
             ) : null}
 

@@ -61,7 +61,7 @@ router.get('/:id', requireAuth, async (req, res, next) => {
  */
 router.put('/:id/status', requireAuth, async (req, res, next) => {
   try {
-    const { status, assigned_to, is_ai_disabled } = req.body;
+    const { status, assigned_to, is_ai_disabled, clear_ai_pause } = req.body;
     const updatePayload = {};
 
     if (status) updatePayload.status = status;
@@ -96,9 +96,17 @@ router.put('/:id/status', requireAuth, async (req, res, next) => {
       return res.status(404).json({ error: 'Conversation not found or access denied' });
     }
 
-    if (is_ai_disabled !== undefined && updatedConversation.customers?.id) {
+    if ((is_ai_disabled !== undefined || clear_ai_pause !== undefined) && updatedConversation.customers?.id) {
       const currentMetadata = updatedConversation.customers.metadata || {};
-      const updatedMetadata = { ...currentMetadata, is_ai_disabled };
+      const updatedMetadata = { ...currentMetadata };
+
+      if (is_ai_disabled !== undefined) {
+        updatedMetadata.is_ai_disabled = is_ai_disabled;
+      }
+
+      if (clear_ai_pause) {
+        updatedMetadata.ai_paused_until = null;
+      }
 
       const { data: customer, error: custErr } = await supabase
         .from('customers')
@@ -109,6 +117,17 @@ router.put('/:id/status', requireAuth, async (req, res, next) => {
 
       if (custErr) throw custErr;
       updatedConversation.customers = customer;
+
+      if (clear_ai_pause) {
+        // Insert system message logging the re-activation
+        await supabase
+          .from('messages')
+          .insert({
+            conversation_id: req.params.id,
+            sender_type: 'system',
+            content: '✅ Alice IA reativada por atendimento humano.'
+          });
+      }
     }
 
     res.json(updatedConversation);
