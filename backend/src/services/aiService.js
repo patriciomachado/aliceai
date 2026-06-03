@@ -1156,12 +1156,11 @@ ${nichePrompt}${paymentPrompt}
 SIGA as instruções acima RIGOROSAMENTE. Responda de forma direta, concisa e amigável.
 Não repita perguntas que já foram respondidas no histórico.
 
-REGRA CRÍTICA DE PRODUTOS E VALORES — TOLERÂNCIA ZERO A ALUCINAÇÕES:
-- Você SÓ PODE confirmar a existência, passar valores, descrições e estoques de produtos ou serviços que estejam listados EXPLICITAMENTE abaixo em "PRODUTOS DISPONÍVEIS NO SISTEMA" ou "SERVIÇOS DISPONÍVEIS NO SISTEMA".
-- Se o cliente perguntar por um produto, acessório ou serviço que NÃO esteja nessa lista (ou se a lista de produtos/serviços estiver vazia), você JAMAIS, EM HIPÓTESE ALGUMA, deve inventar modelos, marcas, estoques, preços ou valores. Isso é uma violação gravíssima.
-- ANTES de responder qualquer valor monetário (R$), SEMPRE verifique se o produto/serviço exato está listado no catálogo abaixo. Se NÃO estiver listado, NÃO mencione nenhum preço — nem estimado, nem aproximado, nem "a partir de".
-- Em vez de inventar, responda educadamente de forma simpática que não localizou esse item específico em nosso catálogo ativo no sistema, e ofereça-se para chamar um atendente humano para verificar a disponibilidade de estoque ou encomendar o item para ele.
-- Esta regra aplica-se a QUALQUER tipo de item: acessórios, peças, capas, películas, carregadores, fones de ouvido, microfones, cabos, baterias, teclados, mouses, etc. Se não está na lista oficial abaixo, você NÃO tem o produto e NÃO sabe o preço.
+REGRA CRÍTICA DE PRODUTOS E VALORES — TOLERÂNCIA ZERO A ALUCINAÇÕES E ORÇAMENTOS INVENTADOS:
+- Você SÓ PODE confirmar a existência, passar valores, orçamentos, estimativas, descrições e estoques de produtos ou serviços que estejam listados EXPLICITAMENTE abaixo em "PRODUTOS DISPONÍVEIS NO SISTEMA" ou "SERVIÇOS DISPONÍVEIS NO SISTEMA".
+- Se o cliente perguntar por um produto, serviço, conserto ou orçamento que NÃO esteja nessa lista (ou se a lista de produtos/serviços estiver vazia), você JAMAIS, EM HIPÓTESE ALGUMA, deve chutar, estimar ou inventar qualquer valor ou faixa de preço (ex: "deve custar cerca de R$ X", "o orçamento fica entre R$ X e R$ Y"). Isso é uma violação gravíssima e inaceitável.
+- ANTES de passar qualquer orçamento ou valor monetário (R$), SEMPRE verifique se o produto ou serviço exato está listado no catálogo abaixo. Se NÃO estiver listado, diga de forma direta e gentil que não possui o preço ou orçamento para esse item no sistema e que irá transferir para um colaborador humano para calcular o valor.
+- Esta regra aplica-se a QUALQUER tipo de orçamento, conserto, peça, acessório ou serviço. Se não está nas tabelas oficiais abaixo, você NÃO tem o preço e NÃO sabe o valor.
 
 REGRAS OBRIGATÓRIAS DE FORMATAÇÃO E QUALIDADE:
 - Use QUEBRAS DE LINHA (\n) para separar blocos de informação e listas de produtos/serviços. Nunca envie um "textão" corrido sem parágrafos.
