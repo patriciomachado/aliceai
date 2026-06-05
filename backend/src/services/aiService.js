@@ -625,57 +625,22 @@ const createOrderInDB = async (args, workspaceId) => {
     let totalAmount = 0;
     const orderItemsPayload = [];
 
-    // Ensure we have a generic product in the workspace database for any unrecognized item
-    const getOrCreateGenericProduct = async () => {
-      const { data: existingGeneric } = await supabase
-        .from('products')
-        .select('*')
-        .eq('workspace_id', workspaceId)
-        .eq('name', 'Produto Personalizado')
-        .limit(1)
-        .maybeSingle();
-
-      if (existingGeneric) {
-        return existingGeneric;
-      }
-
-      const crypto = require('crypto');
-      const newProductId = crypto.randomUUID();
-      const { data: newProd, error: createErr } = await supabase
-        .from('products')
-        .insert({
-          id: newProductId,
-          workspace_id: workspaceId,
-          name: 'Produto Personalizado',
-          description: 'Item de pedido personalizado (preço a calcular no momento da entrega/retirada)',
-          price: 0.00,
-          stock: 999,
-          category: 'Geral',
-          sku: `custom-${Date.now()}`
-        })
-        .select()
-        .single();
-
-      if (createErr) {
-        console.error('[AI Tool] Failed to create generic product fallback:', createErr.message);
-        throw new Error(createErr.message);
-      }
-      return newProd;
-    };
-
-    let cachedGenericProduct = null;
+    // REGRA DE INTEGRIDADE: Somente produtos cadastrados no workspace podem ser pedidos.
+    // Nenhum produto fantasma/genérico será criado. Se o product_id não existir no catálogo
+    // do workspace, o pedido inteiro é rejeitado com mensagem de erro clara.
+    const invalidItems = items.filter(item => !products.find(p => p.id === item.product_id));
+    if (invalidItems.length > 0) {
+      const invalidIds = invalidItems.map(i => i.product_id).join(', ');
+      console.warn(`[AI Tool] ❌ Pedido rejeitado: product_id(s) não encontrado(s) no catálogo do workspace: ${invalidIds}`);
+      return JSON.stringify({
+        success: false,
+        error: 'Produto não encontrado no catálogo',
+        message: 'Um ou mais produtos solicitados não estão cadastrados no sistema. O pedido não pode ser criado. Por favor, selecione apenas produtos listados no catálogo oficial.'
+      });
+    }
 
     for (const item of items) {
-      let prod = products.find(p => p.id === item.product_id);
-      if (!prod) {
-        // Self-healing fallback: Load or create a generic product for this item
-        console.log(`[AI Tool] Product ID ${item.product_id} not found in database. Using self-healing generic product fallback.`);
-        if (!cachedGenericProduct) {
-          cachedGenericProduct = await getOrCreateGenericProduct();
-        }
-        prod = cachedGenericProduct;
-        item.product_id = prod.id;
-      }
+      const prod = products.find(p => p.id === item.product_id);
 
       const qty = Number(item.quantity) || 1;
       const subtotal = Number(prod.price) * qty;
@@ -1142,12 +1107,8 @@ ${activeOrdersList.map(o => `- Pedido ID: ${o.id} | Total: R$ ${Number(o.total_a
     }
 
     let techContextSection = `\n\nCONTEXTO TECNOLÓGICO DE 2026:
-- Estamos no ano de 2026. Portanto, os modelos iPhone 15 (lançado em 2023), iPhone 16 (lançado em 2024) e iPhone 17 (lançado em 2025) já foram lançados e são smartphones reais e extremamente comuns no mercado atual. O iPhone 18 será lançado no final deste ano de 2026.
-- Se o cliente perguntar sobre o reparo ou orçamento de um modelo de iPhone recente (como iPhone 15, 16, 17, 17 Pro, etc.) que não esteja listado explicitamente na nossa lista estática de produtos ou serviços abaixo:
-  * NUNCA diga ao cliente que o modelo não existe ou que só existe até o 15 Pro Max.
-  * Confirme de forma profissional que esses modelos existem.
-  * Explique que, por serem aparelhos mais novos ou que necessitam de cotação de peças sob demanda, você não tem o valor fixado em seu sistema neste exato momento.
-  * Ofereça-se para verificar com o setor técnico a disponibilidade e o valor personalizado, direcionando o atendimento para um técnico humano para concluir o orçamento.`;
+- Estamos no ano de 2026. Modelos recentes como iPhone 15, 16 e 17 são comuns no mercado.
+- REGRA ABSOLUTA DE ORÇAMENTOS: Se o cliente perguntar sobre reparo, conserto ou orçamento de QUALQUER modelo (antigo ou recente) que NÃO esteja explicitamente listado na tabela "SERVIÇOS DISPONÍVEIS NO SISTEMA", você JAMAIS deve fornecer valor algum — nem estimativa, nem "a partir de", nem "valor base". Informe gentilmente que não possui o valor cadastrado para esse modelo específico no momento e transfira o atendimento para um colaborador humano. NUNCA invente ou estime preços.`;
 
     const systemPrompt = `${systemInstruction}
 
