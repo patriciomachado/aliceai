@@ -1,5 +1,6 @@
 const { openai, model } = require('../config/llm');
 const { supabase } = require('../config/database');
+const { sanitizeReply } = require('./budgetValidator');
 
 /**
  * Returns the current date (YYYY-MM-DD) and time (HH:MM) in Brasília time zone (America/Sao_Paulo)
@@ -1108,7 +1109,13 @@ ${activeOrdersList.map(o => `- Pedido ID: ${o.id} | Total: R$ ${Number(o.total_a
 
     let techContextSection = `\n\nCONTEXTO TECNOLÓGICO DE 2026:
 - Estamos no ano de 2026. Modelos recentes como iPhone 15, 16 e 17 são comuns no mercado.
-- REGRA ABSOLUTA DE ORÇAMENTOS: Se o cliente perguntar sobre reparo, conserto ou orçamento de QUALQUER modelo (antigo ou recente) que NÃO esteja explicitamente listado na tabela "SERVIÇOS DISPONÍVEIS NO SISTEMA", você JAMAIS deve fornecer valor algum — nem estimativa, nem "a partir de", nem "valor base". Informe gentilmente que não possui o valor cadastrado para esse modelo específico no momento e transfira o atendimento para um colaborador humano. NUNCA invente ou estime preços.`;
+- REGRA ABSOLUTA DE ORÇAMENTOS: Se o cliente perguntar sobre reparo, conserto ou orçamento de QUALQUER modelo (antigo ou recente) que NÃO esteja explicitamente listado na tabela "SERVIÇOS DISPONÍVEIS NO SISTEMA", você JAMAIS deve fornecer valor algum — nem estimativa, nem "a partir de", nem "valor base". Informe gentilmente que não possui o valor cadastrado para esse modelo específico no momento e transfira o atendimento para um colaborador humano. NUNCA invente ou estime preços.
+
+🛡️ WHITELIST RIGOROSA DE PREÇOS (NÃO-PONDERÁVEL):
+- Os ÚNICOS valores em reais (R$) que você tem autorização de mencionar são EXATAMENTE aqueles listados nas tabelas "PRODUTOS DISPONÍVEIS NO SISTEMA" e "SERVIÇOS DISPONÍVEIS NO SISTEMA" abaixo.
+- É TERMINANTEMENTE PROIBIDO mencionar qualquer outro valor monetário, mesmo que aproximado, arredondado, "a partir de", "em média", "geralmente custa", "por volta de", "fica em torno de", "valor base", "preço inicial", "starting at", "around" ou qualquer variação.
+- Se a sua resposta não conseguir citar um valor do catálogo, ela NÃO DEVE conter nenhum valor monetário. Responda apenas com a frase de transferência para humano.
+- A sua resposta será validada automaticamente antes de ser enviada ao cliente. Qualquer valor não cadastrado será REMOVIDO, então não tente ser "esperto" e burlar essa regra.`;
 
     const systemPrompt = `${systemInstruction}
 
@@ -1178,6 +1185,12 @@ ${kbMatches.length > 0 ? kbMatches.map(kb => `[${kb.title}]: ${kb.content}`).joi
     }
 
     // 6. First AI call with tool calling
+    // Determine temperature: tighter (0.2) when the customer asks about
+    // prices/budgets to minimize hallucinations. Otherwise 0.45.
+    const pricingIntentRegex = /\b(quanto\s*custa|preço|valor|or[çc]amento|tabela|cobra|fica|custo|reais|investiment)\b/i;
+    const isPricingQuery = pricingIntentRegex.test(messageText);
+    const baseTemp = isPricingQuery ? 0.2 : 0.45;
+
     let reply;
     try {
       const chatCompletion = await openai.chat.completions.create({
@@ -1185,7 +1198,7 @@ ${kbMatches.length > 0 ? kbMatches.map(kb => `[${kb.title}]: ${kb.content}`).joi
         messages: messagesPayload,
         tools: tools.length > 0 ? tools : undefined,
         tool_choice: tools.length > 0 ? 'auto' : undefined,
-        temperature: 0.45, // Balanced: precise enough for tool calling, creative enough for clean Portuguese
+        temperature: baseTemp, // Tight when quoting prices; balanced otherwise
         max_tokens: 4096
       });
 
@@ -1227,7 +1240,7 @@ ${kbMatches.length > 0 ? kbMatches.map(kb => `[${kb.title}]: ${kb.content}`).joi
         const secondCompletion = await openai.chat.completions.create({
           model,
           messages: messagesPayload,
-          temperature: 0.45, // Balanced for clean Portuguese output
+          temperature: baseTemp, // Match first turn determinism
           max_tokens: 4096
         });
         reply = secondCompletion.choices[0].message.content;
@@ -1255,7 +1268,7 @@ ${kbMatches.length > 0 ? kbMatches.map(kb => `[${kb.title}]: ${kb.content}`).joi
       const fallbackCompletion = await openai.chat.completions.create({
         model,
         messages: messagesPayload,
-        temperature: 0.7,
+        temperature: isPricingQuery ? 0.1 : 0.4,
         max_tokens: 4096
       });
       reply = fallbackCompletion.choices[0].message.content;
@@ -1263,11 +1276,33 @@ ${kbMatches.length > 0 ? kbMatches.map(kb => `[${kb.title}]: ${kb.content}`).joi
 
     const cleanedReply = cleanMessageContent(reply);
 
+    // ==========================================
+    // 🛡️  POST-VALIDATION (anti-hallucination)
+    // ==========================================
+    // Catch any price or model mention that is not present in the
+    // workspace catalog. This is the deterministic backstop for the
+    // system prompt rules — even when the model tries to invent a
+    // price, the customer will never see an unauthorized R$ value.
+    const validation = sanitizeReply(
+      cleanedReply,
+      productsList,
+      servicesList,
+      messageText
+    );
+
+    if (validation.wasSanitized) {
+      console.warn(
+        `[AI Service] 🛡️ Reply sanitized — violations: ${validation.violations.join(' | ')}`
+      );
+    }
+
     return {
-      reply: cleanedReply,
+      reply: validation.reply,
       intent: sentimentResult.intent,
       sentiment: sentimentResult.score,
-      entities: sentimentResult.entities
+      entities: sentimentResult.entities,
+      _sanitized: validation.wasSanitized,
+      _violations: validation.violations
     };
 
   } catch (error) {

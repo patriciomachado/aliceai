@@ -1,16 +1,19 @@
 import axios from 'axios';
 
 const getBaseURL = () => {
+  // Highest priority: explicit env var (set in Vercel dashboard or .env)
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
   if (typeof window !== 'undefined') {
-    const { hostname } = window.location;
+    const { hostname, protocol } = window.location;
+    // Local dev: backend on port 3000
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return 'http://localhost:3000/api';
     }
-    // Production VPS environment where Traefik routes /api to the backend
-    return '/api';
+    // Production on Vercel: the API is at /api on the same origin (rewritten
+    // by vercel.json to the serverless function in /api/index.js)
+    return `${protocol}//${hostname}/api`;
   }
   return 'http://localhost:3000/api';
 };

@@ -128,11 +128,11 @@ app.get(['/api', '/api/'], (req, res) => {
 // Global Error Handler
 app.use(errorHandler);
 
-// Start Server (If not running in Jest tests)
-if (process.env.NODE_ENV !== 'test') {
+// Start Server (If not running in Jest tests OR on Vercel serverless)
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   app.listen(PORT, () => {
     logger.info(`Alice Engine successfully running on Port ${PORT}`);
-    
+
     // Auto-connect all saved WhatsApp sessions on startup
     try {
       const whatsappService = require('./services/whatsappService');
@@ -149,6 +149,8 @@ if (process.env.NODE_ENV !== 'test') {
       console.error('[Reminder Service] Initialization failed:', reminderErr);
     }
   });
+} else if (process.env.VERCEL) {
+  logger.info('[Alice Engine] Running on Vercel serverless — WhatsApp/queue/scheduler are handled by the external worker (backend/src/worker.js).');
 }
 
 module.exports = app;

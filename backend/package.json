@@ -5,7 +5,9 @@
   "main": "src/app.js",
   "scripts": {
     "start": "node src/app.js",
+    "worker": "node src/worker.js",
     "dev": "nodemon src/app.js",
+    "dev:worker": "nodemon src/worker.js",
     "test": "jest --passWithNoTests"
   },
   "dependencies": {

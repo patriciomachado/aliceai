@@ -15,5 +15,5 @@ const openai = new OpenAI({
 
 module.exports = {
   openai,
-  model: process.env.OPENAI_MODEL || (isOpenRouter ? 'google/gemini-2.5-pro' : 'gpt-4-turbo')
+  model: process.env.OPENAI_MODEL || (isOpenRouter ? 'anthropic/claude-3.5-sonnet' : 'gpt-4-turbo')
 };
